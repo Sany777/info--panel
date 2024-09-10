@@ -1,4 +1,4 @@
 idf_component_register(SRC_DIRS "src"
                     INCLUDE_DIRS "include"
-                    REQUIRES esp-epaper-display
+                    REQUIRES esp-epaper-display freertos device_common
                     )

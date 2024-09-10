@@ -9,20 +9,35 @@
 
 #include "esp_timer.h"
 #include "driver/gpio.h"
-
 #include "driver/touch_pad.h"
 
 
-
-
-
-static void IRAM_ATTR button_isr_handler(void* arg) 
+int device_get_touch_but_state()
 {
+    uint16_t touch_val;
+    
+    touch_pad_read(TOUCH_BUT_RIGHT, &touch_val);
 
+    if(touch_val < TOUCH_THRESHOLD){
+        return TOUCH_BUT_RIGHT;
+    }
+
+    touch_pad_read(TOUCH_BUT_LEFT, &touch_val);
+
+    if(touch_val < TOUCH_THRESHOLD){
+        return TOUCH_BUT_LEFT;
+    }
+
+    return NO_DATA;
 }
 
 void device_gpio_init() 
 {
+    device_set_pin(PIN_BUZZER, 0);
+    device_set_pin(PIN_BM280_EN, 0);
+    device_set_pin(PIN_EP_EN, 0);
+    device_set_pin(PIN_DHT10_EN, 0);
+    gpio_set_direction((gpio_num_t)32, GPIO_MODE_INPUT);
     touch_pad_init();
     touch_pad_config(TOUCH_BUT_LEFT, TOUCH_THRESHOLD);
     touch_pad_config(TOUCH_BUT_RIGHT, TOUCH_THRESHOLD);

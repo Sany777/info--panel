@@ -7,8 +7,13 @@ extern "C" {
 
 #define MESUR_NUM 1
 
+
+
 void adc_reader_init(void);
-float adc_reader_get_voltage(void);
+float device_get_voltage();
+
+
+
 
 #ifdef __cplusplus
 }

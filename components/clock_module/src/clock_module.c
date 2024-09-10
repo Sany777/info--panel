@@ -6,10 +6,10 @@
 #include "esp_sntp.h"
 #include "wifi_service.h"
 #include "esp_err.h"
-
+#include "periodic_task.h"
 #include "toolbox.h"
 
-#define INTERVAL_10_HOUR   (1000*60*60*10)
+#define INTERVAL_8_HOUR   (1000*60*60*8)
 
 
 
@@ -49,7 +49,7 @@ static void set_time_cb(struct timeval *tv)
 {
     tv->tv_sec += 3600 * device_get_offset();
     settimeofday(tv, NULL);
-    device_set_state(BIT_NEW_MIN|BIT_IS_TIME|BIT_SNTP_OK);
+    device_set_state(BIT_IS_TIME);
 }
 
 
@@ -64,7 +64,7 @@ void init_sntp()
         esp_sntp_setservername(0, "pool.ntp.org");
         esp_sntp_setservername(1, "time.windows.com");
         sntp_servermode_dhcp(0);
-        esp_sntp_set_sync_interval(INTERVAL_10_HOUR);
+        esp_sntp_set_sync_interval(INTERVAL_8_HOUR);
         esp_sntp_init();
     }
 }
@@ -73,7 +73,6 @@ void init_sntp()
 void stop_sntp()
 {
     esp_sntp_stop();
-    device_clear_state(BIT_SNTP_OK);
 }
 
 // format :

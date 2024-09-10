@@ -12,7 +12,6 @@ int init_nvs()
 {
     if(!is_init){
         esp_err_t ret = nvs_flash_init();
-
         if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
             CHECK_AND_RET_ERR(nvs_flash_erase());
             CHECK_AND_RET_ERR(nvs_flash_init());
