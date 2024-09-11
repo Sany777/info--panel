@@ -27,21 +27,17 @@ void start_single_signale(unsigned delay)
     start_signale_series(delay, 1);
 }
 
-
 void short_signale()
 {
-    start_signale_series(5, 1);
+    start_single_signale(25);
 }
 
 void long_signale()
 {
-    start_signale_series(50, 2);
+    start_single_signale(50);
 }
 
-void sig_disable()
-{
-    start_single_signale(70);
-}
+
 
 void sound_off()
 {

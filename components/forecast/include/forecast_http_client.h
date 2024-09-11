@@ -15,7 +15,7 @@ extern "C" {
 
 
 
-int get_weather(const char *city, const char *api_key);
+int update_forecast_data(const char *city, const char *api_key);
 
 
 

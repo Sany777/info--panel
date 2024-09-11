@@ -38,6 +38,7 @@ void device_gpio_init()
     device_set_pin(PIN_EP_EN, 0);
     device_set_pin(PIN_DHT10_EN, 0);
     gpio_set_direction((gpio_num_t)32, GPIO_MODE_INPUT);
+    gpio_set_level((gpio_num_t)32, 0);
     touch_pad_init();
     touch_pad_config(TOUCH_BUT_LEFT, TOUCH_THRESHOLD);
     touch_pad_config(TOUCH_BUT_RIGHT, TOUCH_THRESHOLD);

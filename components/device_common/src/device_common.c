@@ -36,7 +36,7 @@ static int read_data();
 
 void device_set_offset(int time_offset)
 {
-    set_offset(time_offset - main_data.time_offset);
+    set_timezone(time_offset - main_data.time_offset);
     main_data.time_offset = time_offset;
     changes_main_data = true;
 }
@@ -142,6 +142,7 @@ static int read_data()
 
 void device_init()
 {
+    
     clock_event_group = xEventGroupCreate();
     device_gpio_init();
     read_data();

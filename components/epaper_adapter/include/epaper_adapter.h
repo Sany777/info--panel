@@ -20,7 +20,6 @@ typedef enum FontSize{
     FONT_SIZE_12 = 0,
     FONT_SIZE_16,
     FONT_SIZE_20,
-    FONT_SIZE_34,
     FONT_SIZE_MAX
 }font_size_t ;
 

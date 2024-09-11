@@ -5,7 +5,7 @@
 #include "device_common.h"
 #include "device_macro.h"
 
-#define SIZE_URL_BUF 250
+#define SIZE_URL_BUF 200
 #define MAX_KEY_NUM 10
 
 extern char network_buf[];
@@ -116,13 +116,12 @@ static void split(char *data_buf, size_t data_size, const char *split_chars_str)
 }
 #include "esp_log.h"
 
-int get_weather(const char *city, const char *api_key)
+int update_forecast_data(const char *city, const char *api_key)
 {
     int res = ESP_FAIL;
     char **feels_like_list = NULL, 
             **description_list = NULL, 
             **pop_list = NULL, 
-            **dt = NULL, 
             **id_list = NULL,
             **sunrise = NULL,
             **sunset = NULL; 
@@ -146,24 +145,23 @@ int get_weather(const char *city, const char *api_key)
     esp_http_client_handle_t client = esp_http_client_init(&config);
     esp_http_client_perform(client);
     const size_t data_size = esp_http_client_get_content_length(client);
-    if(data_size){
-        network_buf[data_size] = 0;
 
+    if(data_size > 0){
+        network_buf[data_size] = 0;
         const size_t pop_num = get_value_ptrs(&pop_list, network_buf, data_size, "\"pop\":");
         const size_t feels_like_num = get_value_ptrs(&feels_like_list, network_buf, data_size, "\"feels_like\":");
         const size_t id_list_size = get_value_ptrs(&id_list, network_buf, data_size, "\"id\":");
         const size_t description_num = get_value_ptrs(&description_list, network_buf, data_size, "\"description\":\"");
         get_value_ptrs(&sunrise, network_buf, data_size, "\"sunrise\":");
         get_value_ptrs(&sunset, network_buf, data_size, "\"sunset\":");
-        get_value_ptrs(&dt, network_buf, data_size,"\"dt\":");
 
         split(network_buf, data_size, "},\"");
 
         struct tm * tinfo;
 
         if(sunrise){
-            time_t time_now = atol(sunrise[0]);
-            tinfo = gmtime(&time_now);
+            time_t time = atol(sunrise[0]);
+            tinfo = localtime(&time);
             service_data.sunrise_hour = tinfo->tm_hour;
             service_data.sunrise_min = tinfo->tm_min;
             free(sunrise);
@@ -171,8 +169,8 @@ int get_weather(const char *city, const char *api_key)
         }
         
         if(sunset){
-            time_t time_now = atol(sunset[0]);
-            tinfo = gmtime(&time_now);
+            time_t time = atol(sunset[0]);
+            tinfo = localtime(&time);
             service_data.sunset_hour = tinfo->tm_hour;
             service_data.sunset_min = tinfo->tm_min;
             free(sunset);
@@ -194,14 +192,6 @@ int get_weather(const char *city, const char *api_key)
             }
             free(id_list);
             id_list = NULL;
-        }
-
-        if(dt){
-            time_t time_now  = atol(dt[0]);
-            tinfo = gmtime(&time_now);
-            service_data.update_data_time = tinfo->tm_hour;
-            free(dt);
-            dt = NULL;
         }
 
         if(feels_like_list){

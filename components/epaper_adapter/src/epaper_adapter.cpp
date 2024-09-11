@@ -23,7 +23,7 @@ static unsigned char update_screen_indicator[SCREEN_WIDTH * SCREEN_HEIGHT/8];
 
 static char text_buf[150];
 static const int USE_SCREEN_WIDTH = SCREEN_WIDTH-4;
-static sFONT *font_list[] = {&Font12, &Font16, &Font20, &Font34};
+static sFONT *font_list[] = {&Font12, &Font16, &Font20};
 
 
 void epaper_init()
@@ -100,7 +100,7 @@ void epaper_print_centered_str(int ver, font_size_t font_size, color_t color, co
         if(str_width < USE_SCREEN_WIDTH){
             hor += (USE_SCREEN_WIDTH - str_width) / 2;  
         }
-        epaper_print_str(hor, ver, font_size, color, text_buf);
+        epaper_print_str(hor, ver, font_size, color, str);
     }
 }
 

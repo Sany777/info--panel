@@ -5,9 +5,16 @@
 #include "stdlib.h"
 
 
+uint8_t battery_voltage_to_percentage(float voltage) 
+{
+    if (voltage >= 4.2) return 100;
+    if (voltage <= 3.2) return 0;
+    return (uint8_t)((voltage - 3.2) * 100 / (4.2 - 3.0));
+}
+
 int get_actual_forecast_data_index(struct tm *tm_info, int update_data_time)
 {
-    unsigned time_dif;
+    int time_dif;
     if(update_data_time < 0 
         || tm_info->tm_hour < 0
         || update_data_time > 23 

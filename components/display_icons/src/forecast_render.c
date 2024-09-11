@@ -1,9 +1,38 @@
 #include "display_icons.h"
 
 
+const uint8_t *get_battery_icon_bitmap(float bat_voltage)
+{
+  int bat_mvolt = bat_voltage * 1000;
+  if(bat_mvolt < 3200){
+    return battery_alert;
+  }
+  if(bat_mvolt < 3300){
+    return battery_0_bar;
+  }
+  if(bat_mvolt < 3400){
+    return battery_1_bar;
+  }
+  if(bat_mvolt < 3500){
+    return battery_2_bar;
+  }
+  if(bat_mvolt < 3600){
+    return battery_3_bar;
+  }
+  if(bat_mvolt < 3700){
+    return battery_4_bar;
+  }
+  if(bat_mvolt < 3900){
+    return battery_5_bar;
+  }
+  if(bat_mvolt < 4000){
+    return battery_6_bar;
+  }
+  return battery_charging_full;
 
+}
 
-const uint8_t *get_bitmap(int id, int clouds, bool day)
+const uint8_t *update_forecast_data_icon_bitmap(int id, int clouds, bool day)
 {
   bool cloudy = clouds > 60; 
   switch (id)

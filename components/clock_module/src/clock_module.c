@@ -36,37 +36,29 @@ void set_time_ms(long long time_ms)
     device_set_state(BIT_IS_TIME);
 }
 
-void set_offset(int offset_hour)
-{
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    tv.tv_sec = tv.tv_sec + offset_hour*60*60;
-    settimeofday(&tv, NULL);
-}
 
+void set_timezone(int offset_hours) 
+{
+    char tz[20]; 
+    snprintf(tz, sizeof(tz), "UTC%+d", -offset_hours);
+    setenv("TZ", tz, 1);
+    tzset();  
+}
 
 static void set_time_cb(struct timeval *tv)
 {
-    tv->tv_sec += 3600 * device_get_offset();
-    settimeofday(tv, NULL);
     device_set_state(BIT_IS_TIME);
 }
 
 
 void init_sntp()
 {
-    if(esp_sntp_enabled()){
-        esp_sntp_restart();
-    } else {
-        esp_sntp_set_time_sync_notification_cb(set_time_cb);
-        esp_sntp_set_sync_mode(SNTP_SYNC_MODE_IMMED);
-        esp_sntp_setoperatingmode(ESP_SNTP_OPMODE_POLL);
-        esp_sntp_setservername(0, "pool.ntp.org");
-        esp_sntp_setservername(1, "time.windows.com");
-        sntp_servermode_dhcp(0);
-        esp_sntp_set_sync_interval(INTERVAL_8_HOUR);
-        esp_sntp_init();
-    }
+    esp_sntp_set_time_sync_notification_cb(set_time_cb);
+    esp_sntp_set_sync_mode(SNTP_SYNC_MODE_SMOOTH);
+    esp_sntp_setoperatingmode(ESP_SNTP_OPMODE_POLL);
+    esp_sntp_setservername(0, "pool.ntp.org");
+    esp_sntp_servermode_dhcp(1);
+    esp_sntp_init();
 }
 
 
