@@ -46,11 +46,10 @@ enum TaskDelay{
 
 static int delay_update_forecast;
 static float temp, pres;
+
 static void show_screen();
 static bool is_long_pressed(const int but_id);
-
 static void update_forecast_handler();
-static void device_reboot();
 static void sig_end_update_screen_handler();
 static void sig_end_but_inp_handler();
 
@@ -64,7 +63,7 @@ static void main_task(void *pv)
     int but_val = NO_DATA;
     unsigned timeout = TIMEOUT_10_SEC*1000;
     long long counter, time_work = 0;
-    create_periodic_task(device_reboot, TIMEOUT_UPDATE_DATA, FOREVER);
+
     device_set_state(BIT_UPDATE_FORECAST_DATA|BIT_CHECK_BAT);
 
     for(;;){
@@ -160,7 +159,8 @@ static void service_task(void *pv)
     delay_update_forecast = DELAY_UPDATE_INIT;
     vTaskDelay(100/portTICK_PERIOD_MS);
     int esp_res, wait_client_timeout;
-    bool fail_init_sntp = 0;
+    bool fail_init_sntp = false;
+    struct tm * tinfo;
     for(;;){
         device_wait_bits_untile(BIT_UPDATE_FORECAST_DATA|BIT_START_SERVER, 
                             portMAX_DELAY);
@@ -216,12 +216,12 @@ static void service_task(void *pv)
                 }
                 esp_res = update_forecast_data(device_get_city_name(),device_get_api_key());
             }
-            
             if(esp_res == ESP_OK){
-                if(fail_init_sntp){
-                    device_reboot();
+                tinfo = get_cur_time_tm();
+                if(fail_init_sntp || service_data.update_data_time > tinfo->tm_hour){
+                    esp_restart();
                 }
-                service_data.update_data_time = get_time_tm()->tm_hour;
+                service_data.update_data_time = tinfo->tm_hour;
                 if(! (bits&BIT_FORECAST_OK)){
                     delay_update_forecast = DELAY_UPDATE_FORECAST;
                     create_periodic_task(update_forecast_handler, delay_update_forecast, FOREVER);
@@ -231,7 +231,8 @@ static void service_task(void *pv)
                 if(bits&BIT_FORECAST_OK){
                     device_clear_state(BIT_FORECAST_OK);
                 }
-                if(service_data.update_data_time == NO_DATA){
+
+                if(!fail_init_sntp && service_data.update_data_time == NO_DATA){
                     fail_init_sntp = true;
                 }
                 if(fail_init_sntp && delay_update_forecast < DELAY_UPDATE_FORECAST){
@@ -254,9 +255,9 @@ static void service_task(void *pv)
 
 static void show_screen()
 {
-    int data_indx, rect_x0, rect_x1;
-    struct tm * tinfo = get_time_tm();
-
+    int data_indx, rect_x0, rect_x1, udt;
+    struct tm * tinfo = get_cur_time_tm();
+    const bool is_day = tinfo->tm_hour < service_data.sunset_hour;
     const unsigned bits = device_get_state();
     epaper_display_image(-8, -8, 64, 64, RED, house);
     epaper_printf(7, 25, FONT_SIZE_16, BLACK, "%+d", (int)temp);
@@ -272,7 +273,7 @@ static void show_screen()
             epaper_print_centered_str(80, FONT_SIZE_16, RED, "No data available");
         } 
     } else {
-        int udt = service_data.update_data_time;
+        udt = service_data.update_data_time;
         data_indx = get_actual_forecast_data_index(tinfo, udt);
         if(data_indx == NO_DATA){
             epaper_printf_centered(60, FONT_SIZE_16, RED, "Data update time %d:00", udt);
@@ -282,21 +283,21 @@ static void show_screen()
                                     service_data.sunset_hour, service_data.sunset_min);
             epaper_display_image(230, -7, 64, 64, BLACK, 
                         update_forecast_data_icon_bitmap(service_data.id_list[data_indx], 
-                        service_data.pop_list[data_indx],
-                        tinfo->tm_hour > service_data.sunset_hour));
+                        service_data.pop_list[data_indx], is_day
+                        ));
             epaper_printf(100, 17, FONT_SIZE_20, BLACK,
                                      "%+d*C", 
                                     service_data.temp_list[data_indx]);
             epaper_printf_centered(48, FONT_SIZE_20, BLACK, "%s", 
                                     service_data.desciption[data_indx]);
-            for(int i=data_indx; i<FORECAST_LIST_SIZE; ++i){
+            for(int shift = 0, i = data_indx; i<FORECAST_LIST_SIZE; ++i){
                 if(udt>23)udt %= 24;
-                rect_x0 = 13+i*46;
+                rect_x0 = 13+shift*46;
                 rect_x1 = rect_x0+40;
                 draw_rect(rect_x0, 68, rect_x1, 112, RED, false);
-                epaper_printf(16+i*46, 70, FONT_SIZE_12, BLACK, "%d:00", udt);
-                epaper_printf(22+i*46, 85, FONT_SIZE_12, BLACK, "%+d", service_data.temp_list[i]);
-                epaper_printf(23+i*46, 100, FONT_SIZE_12, BLACK, "%d%%", service_data.pop_list[i]);
+                epaper_printf(16+shift*46, 70, FONT_SIZE_12, BLACK, "%d:00", udt);
+                epaper_printf(22+shift*46, 85, FONT_SIZE_12, BLACK, "%+d", service_data.temp_list[i]);
+                epaper_printf(23+shift*46, 100, FONT_SIZE_12, BLACK, "%d%%", service_data.pop_list[i]);
                 udt += 3;
             }
         }
@@ -324,12 +325,6 @@ static bool is_long_pressed(const int but_id)
 static void update_forecast_handler()
 {
     device_set_state_isr(BIT_UPDATE_FORECAST_DATA);
-}
-
-
-static void device_reboot()
-{
-    esp_restart();
 }
 
 
