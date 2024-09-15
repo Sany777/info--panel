@@ -13,10 +13,7 @@
 
 
 
-int get_time_sec(struct tm* tinfo)
-{
-    return tinfo->tm_hour*3600 + tinfo->tm_min*60 + tinfo->tm_sec;
-}
+
 
 struct tm* get_cur_time_tm(void)
 {
@@ -26,24 +23,14 @@ struct tm* get_cur_time_tm(void)
 }
 
 
-void set_time_ms(long long time_ms)
+void set_offset(int offset_hour)
 {
-    int offet_sec = device_get_offset() * 60 * 60;
     struct timeval tv;
-    tv.tv_sec = time_ms/1000 + offet_sec;
-    tv.tv_usec = time_ms%1000;
+    gettimeofday(&tv, NULL);
+    tv.tv_sec = tv.tv_sec + offset_hour*60*60;
     settimeofday(&tv, NULL);
-    device_set_state(BIT_IS_TIME);
 }
 
-
-void set_timezone(int offset_hours) 
-{
-    char tz[20]; 
-    snprintf(tz, sizeof(tz), "UTC%+d", -offset_hours);
-    setenv("TZ", tz, 1);
-    tzset();  
-}
 
 static void set_time_cb(struct timeval *tv)
 {
@@ -56,7 +43,10 @@ void init_sntp()
     esp_sntp_set_time_sync_notification_cb(set_time_cb);
     esp_sntp_set_sync_mode(SNTP_SYNC_MODE_SMOOTH);
     esp_sntp_setoperatingmode(ESP_SNTP_OPMODE_POLL);
-    esp_sntp_setservername(0, "pool.ntp.org");
+    esp_sntp_setservername(0, "0.ua.pool.ntp.org");
+    esp_sntp_setservername(1, "1.ua.pool.ntp.org");
+    esp_sntp_setservername(2, "2.ua.pool.ntp.org");
+    esp_sntp_setservername(3, "pool.ntp.org");
     esp_sntp_servermode_dhcp(1);
     esp_sntp_init();
 }

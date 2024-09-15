@@ -129,13 +129,13 @@ void epaper_refresh()
 
 bool epaper_update()
 {
-    if(memcmp(update_screen_indicator, screen, sizeof(update_screen_indicator) != 0)){
+    if(memcmp(update_screen_indicator, screen, sizeof(screen)) != 0){
         epd.WaitUntilIdle();
         epd.DisplayBlack(screen);
         epd.DisplayRed(screen_red);
         epd.DisplayFrame();
+        memcpy(update_screen_indicator, screen, sizeof(screen));
         epd.WaitUntilIdle();
-        memcpy(update_screen_indicator, screen, sizeof(update_screen_indicator));
         return true;
     }
     return false;

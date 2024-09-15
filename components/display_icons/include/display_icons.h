@@ -6,13 +6,12 @@ extern "C" {
 #endif
 
 
-#include "stdint.h"
-#include "stdbool.h"
+
 
 #include "bitmap_icons.h"
 
-const uint8_t *get_battery_icon_bitmap(float bat_voltage);
-const uint8_t *update_forecast_data_icon_bitmap(int id, int clouds, bool day);
+const unsigned char * get_battery_icon_bitmap(const int percentage);
+const unsigned char *get_forecast_data_icon(int id, int day);
 
 #ifdef __cplusplus
 }

@@ -171,14 +171,14 @@ void wifi_stop()
     device_clear_state(BIT_IS_AP_CLIENT|BIT_IS_AP_CONNECTION|BIT_IS_STA_CONNECTION);
     if (wifi_mode == WIFI_MODE_AP){
         esp_wifi_stop();
-        vTaskDelay(100/portTICK_PERIOD_MS);
+        vTaskDelay(500/portTICK_PERIOD_MS);
         esp_event_handler_unregister(WIFI_EVENT, WIFI_EVENT_AP_STADISCONNECTED, &ap_handler);
         esp_event_handler_unregister(WIFI_EVENT, WIFI_EVENT_AP_STACONNECTED, &ap_handler);
         esp_event_handler_unregister(WIFI_EVENT, WIFI_EVENT_AP_START, &ap_handler);
         esp_event_handler_unregister(WIFI_EVENT, WIFI_EVENT_AP_STOP, &ap_handler);
     } else if (wifi_mode == WIFI_MODE_STA) {
         esp_wifi_stop();
-        vTaskDelay(100/portTICK_PERIOD_MS);
+        vTaskDelay(500/portTICK_PERIOD_MS);
         esp_event_handler_unregister(WIFI_EVENT, WIFI_EVENT_STA_START, &sta_handler);
         esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, &sta_handler);
         esp_event_handler_unregister(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, &sta_handler);

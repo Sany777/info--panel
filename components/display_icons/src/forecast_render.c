@@ -1,40 +1,38 @@
 #include "display_icons.h"
 
 
-const uint8_t *get_battery_icon_bitmap(float bat_voltage)
+const unsigned char * get_battery_icon_bitmap(const int percentage)
 {
-  int bat_mvolt = bat_voltage * 1000;
-  if(bat_mvolt < 3200){
+  if(percentage < 10){
     return battery_alert;
   }
-  if(bat_mvolt < 3300){
+  if(percentage < 20){
     return battery_0_bar;
   }
-  if(bat_mvolt < 3400){
+  if(percentage < 35){
     return battery_1_bar;
   }
-  if(bat_mvolt < 3500){
+  if(percentage < 45){
     return battery_2_bar;
   }
-  if(bat_mvolt < 3600){
+  if(percentage < 60){
     return battery_3_bar;
   }
-  if(bat_mvolt < 3700){
+  if(percentage < 70){
     return battery_4_bar;
   }
-  if(bat_mvolt < 3900){
+  if(percentage < 85){
     return battery_5_bar;
   }
-  if(bat_mvolt < 4000){
+  if(percentage < 95){
     return battery_6_bar;
   }
   return battery_charging_full;
 
 }
 
-const uint8_t *update_forecast_data_icon_bitmap(int id, int clouds, bool day)
+const unsigned char * get_forecast_data_icon(int id, int day)
 {
-  bool cloudy = clouds > 60; 
   switch (id)
   {
   // Group 2xx: Thunderstorm
@@ -45,12 +43,12 @@ const uint8_t *update_forecast_data_icon_bitmap(int id, int clouds, bool day)
   case 211: // Thunderstorm  thunderstorm                     11d
   case 212: // Thunderstorm  heavy thunderstorm               11d
   case 221: // Thunderstorm  ragged thunderstorm              11d
-    if (!cloudy && day)          {return wi_day_thunderstorm;}
+    if (day)          {return wi_day_thunderstorm;}
     return wi_thunderstorm;
   case 230: // Thunderstorm  thunderstorm with light drizzle  11d
   case 231: // Thunderstorm  thunderstorm with drizzle        11d
   case 232: // Thunderstorm  thunderstorm with heavy drizzle  11d
-    if (!cloudy && day)          {return wi_day_storm_showers;}
+    if (day)          {return wi_day_storm_showers;}
     return wi_storm_showers;
   // Group 3xx: Drizzle
   case 300: // Drizzle       light intensity drizzle          09d
@@ -62,7 +60,7 @@ const uint8_t *update_forecast_data_icon_bitmap(int id, int clouds, bool day)
   case 313: // Drizzle       shower rain and drizzle          09d
   case 314: // Drizzle       heavy shower rain and drizzle    09d
   case 321: // Drizzle       shower drizzle                   09d
-    if (!cloudy && day)          {return wi_day_showers;}
+    if (day)          {return wi_day_showers;}
     return wi_showers;
   // Group 5xx: Rain
   case 500: // Rain          light rain                       10d
@@ -70,42 +68,42 @@ const uint8_t *update_forecast_data_icon_bitmap(int id, int clouds, bool day)
   case 502: // Rain          heavy intensity rain             10d
   case 503: // Rain          very heavy rain                  10d
   case 504: // Rain          extreme rain                     10d
-    if (!cloudy && day)                   {return wi_day_rain;}
+    if (day)                   {return wi_day_rain;}
     return wi_rain;
   case 511: // Rain          freezing rain                    13d
-    if (!cloudy && day)          {return wi_day_rain_mix;}
+    if (day)          {return wi_day_rain_mix;}
     return wi_rain_mix;
   case 520: // Rain          light intensity shower rain      09d
   case 521: // Rain          shower rain                      09d
   case 522: // Rain          heavy intensity shower rain      09d
   case 531: // Rain          ragged shower rain               09d
-    if (!cloudy && day)          {return wi_day_showers;}
+    if (day)          {return wi_day_showers;}
     return wi_showers;
   // Group 6xx: Snow
   case 600: // Snow          light snow                       13d
   case 601: // Snow          Snow                             13d
   case 602: // Snow          Heavy snow                       13d
-    if (!cloudy && day)                   {return wi_day_snow;}
+    if (day)                   {return wi_day_snow;}
     return wi_snow;
   case 611: // Snow          Sleet                            13d
   case 612: // Snow          Light shower sleet               13d
   case 613: // Snow          Shower sleet                     13d
-    if (!cloudy && day)          {return wi_day_sleet;}
+    if (day)          {return wi_day_sleet;}
     return wi_sleet;
   case 615: // Snow          Light rain and snow              13d
   case 616: // Snow          Rain and snow                    13d
   case 620: // Snow          Light shower snow                13d
   case 621: // Snow          Shower snow                      13d
   case 622: // Snow          Heavy shower snow                13d
-    if (!cloudy && day)          {return wi_day_rain_mix;}
+    if (day)          {return wi_day_rain_mix;}
     return wi_rain_mix;
   // Group 7xx: Atmosphere
   case 701: // Mist          mist                             50d
-    if (!cloudy && day)          {return wi_day_fog;}
+    if (day)          {return wi_day_fog;}
     return wi_fog;
 
   case 741: // Fog           fog                              50d
-    if (!cloudy && day)          {return wi_day_fog;}
+    if (day)          {return wi_day_fog;}
     return wi_fog;
   // Group 800: Clear
   case 800: // Clear         clear sky                        01d 01n

@@ -36,13 +36,21 @@ enum Bits{
     BIT_WAIT_PROCCESS           = (1<<10),
     BIT_START_SERVER            = (1<<11),
     BIT_UPDATE_FORECAST_DATA    = (1<<12),
-    BIT_NEW_PERIOD              = (1<<13),
+    BIT_FORCE_UPDATE_FORECAST_DATA  = (1<<13),
     BIT_WAIT_BUT_INPUT          = (1<<15),
     BIT_NEW_DATA                = (1<<16),
     BIT_WAIT_SIGNALE            = (1<<18),
     BIT_IS_LOW_BAT              = (1<<19),
     BIT_CHECK_BAT               = (1<<20),
-    DENIED_SLEEP_BITS           = (BIT_UPDATE_FORECAST_DATA|BIT_SERVER_RUN|BIT_UPDATE_SCREEN|BIT_WAIT_SIGNALE|BIT_WAIT_BUT_INPUT|BIT_WAIT_PROCCESS)
+
+    DENIED_SLEEP_BITS               = (BIT_FORCE_UPDATE_FORECAST_DATA
+                                        |BIT_UPDATE_FORECAST_DATA
+                                        |BIT_SERVER_RUN
+                                        |BIT_UPDATE_SCREEN
+                                        |BIT_WAIT_SIGNALE
+                                        |BIT_WAIT_BUT_INPUT
+                                        |BIT_WAIT_PROCCESS
+                                        |BIT_CHECK_BAT)
 };
 
 typedef struct {
