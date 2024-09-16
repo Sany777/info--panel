@@ -23,12 +23,12 @@ struct tm* get_cur_time_tm(void)
 }
 
 
-void set_offset(int offset_hour)
+void set_offset(int offset_hours) 
 {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    tv.tv_sec = tv.tv_sec + offset_hour*60*60;
-    settimeofday(&tv, NULL);
+    char tz[20]; 
+    snprintf(tz, sizeof(tz), "UTC%+d", -offset_hours);
+    setenv("TZ", tz, 1);
+    tzset();  
 }
 
 

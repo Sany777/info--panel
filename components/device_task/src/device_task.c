@@ -61,6 +61,7 @@ static void main_task(void *pv)
     unsigned timeout = TIMEOUT_10_SEC;
     long long counter, work_time = 0;
     int volt_fail = 0;
+    set_offset(device_get_offset());
     device_set_state(BIT_UPDATE_FORECAST_DATA);
     for(;;){
 
@@ -216,7 +217,6 @@ static void service_task(void *pv)
                     init_sntp();
                     device_wait_bits(BIT_IS_TIME);
                     stop_sntp();
-                    set_offset(device_get_offset());
                 }
                 esp_res = update_forecast_data(device_get_city_name(),device_get_api_key());
             }
