@@ -152,7 +152,6 @@ static void main_task(void *pv)
             timeout = 1;
         } else {
             timeout = TIMEOUT_10_SEC;
-            short_signale();
         }
     }
 }
@@ -259,7 +258,7 @@ static void show_screen()
     int data_indx, rect_x0, rect_x1, udt;
     int cur_hour = get_cur_time_tm()->tm_hour;
     const bool is_day = cur_hour <= service_data.sunset_hour 
-                && cur_hour < service_data.sunrise_hour;
+                && cur_hour > service_data.sunrise_hour;
     const unsigned bits = device_get_state();
     float voltage = device_get_voltage();
     epaper_display_image(-8, -8, 64, 64, RED, house);
