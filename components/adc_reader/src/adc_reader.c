@@ -6,27 +6,25 @@
 
 
 
-#define ADC_CHANNEL ADC2_CHANNEL_4  // GPIO13 (ESP32)
+#define ADC_CHANNEL ADC1_CHANNEL_4  // GPIO32 (ESP32)
 #define ADC_ATTEN ADC_ATTEN_DB_0     
 #define ADC_MAX_VALUE 4095          // 12-bit ADC maximum value
-#define VREF 415 
+#define VOLT_DIV_CONST 4.15F
+#define VREF 1100
 
 
 static const char *TAG = "ADC_READER";
 
-
 void adc_reader_init(void)
 {
     adc1_config_width(ADC_WIDTH_BIT_12);
-    adc2_config_channel_atten(ADC_CHANNEL, ADC_ATTEN);
+    adc1_config_channel_atten(ADC_CHANNEL, ADC_ATTEN);
     ESP_LOGI(TAG, "ADC Initialized");
 }
 
 
 float device_get_voltage(void)
 {
-    int adc_value = 0;
-    adc2_get_raw(ADC_CHANNEL,ADC_WIDTH_BIT_12, &adc_value);
-    float voltage = (((float)adc_value * 10000) / (ADC_MAX_VALUE*1000)) * (VREF / 1000.0);
-    return voltage;
+    int adc_value = adc1_get_raw(ADC_CHANNEL);
+    return ((float)adc_value * VREF * VOLT_DIV_CONST) / ADC_MAX_VALUE;
 }

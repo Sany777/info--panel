@@ -29,7 +29,7 @@ static settings_data_t main_data = {0};
 service_data_t service_data = {0};
 char network_buf[NET_BUF_LEN];
 
-static EventGroupHandle_t clock_event_group;
+static EventGroupHandle_t device_event_group;
 static const char *MAIN_DATA_NAME = "main_data";
 
 static int read_data();
@@ -87,22 +87,22 @@ bool device_commit_changes()
 
 unsigned device_get_state()
 {
-    return xEventGroupGetBits(clock_event_group);
+    return xEventGroupGetBits(device_event_group);
 } 
 
 unsigned  device_set_state(unsigned bits)
 {
-    return xEventGroupSetBits(clock_event_group, (EventBits_t) (bits));
+    return xEventGroupSetBits(device_event_group, (EventBits_t) (bits));
 }
 
 unsigned  device_clear_state(unsigned bits)
 {
-    return xEventGroupClearBits(clock_event_group, (EventBits_t) (bits));
+    return xEventGroupClearBits(device_event_group, (EventBits_t) (bits));
 }
 
 unsigned device_wait_bits_untile(unsigned bits, unsigned time_ticks)
 {
-    return xEventGroupWaitBits(clock_event_group,
+    return xEventGroupWaitBits(device_event_group,
                                 (EventBits_t) (bits),
                                 pdFALSE,
                                 pdFALSE,
@@ -143,7 +143,7 @@ static int read_data()
 void device_init()
 {
     
-    clock_event_group = xEventGroupCreate();
+    device_event_group = xEventGroupCreate();
     device_gpio_init();
     read_data();
     I2C_init();
@@ -155,11 +155,11 @@ void device_init()
 void device_set_state_isr(unsigned bits)
 {
     BaseType_t pxHigherPriorityTaskWoken;
-    xEventGroupSetBitsFromISR(clock_event_group, (EventBits_t)bits, &pxHigherPriorityTaskWoken);
+    xEventGroupSetBitsFromISR(device_event_group, (EventBits_t)bits, &pxHigherPriorityTaskWoken);
     portYIELD_FROM_ISR( pxHigherPriorityTaskWoken );
 }
 
 void  device_clear_state_isr(unsigned bits)
 {
-    xEventGroupClearBitsFromISR(clock_event_group, (EventBits_t)bits);
+    xEventGroupClearBitsFromISR(device_event_group, (EventBits_t)bits);
 }
